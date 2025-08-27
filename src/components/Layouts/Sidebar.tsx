@@ -1,7 +1,8 @@
 import { Layout, Menu } from 'antd'
 import {
     HomeOutlined,
-    BugOutlined
+    BugOutlined,
+    UserSwitchOutlined
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 
@@ -41,6 +42,8 @@ const Sidebar = () => {
                 items={[
                     { key: '/dashboard/issues', icon: <BugOutlined />, label: 'Issues' },
                     { key: '/dashboard/profile', icon: <HomeOutlined />, label: 'Profile' },
+
+                    { key: '/dashboard/users', icon: <UserSwitchOutlined />, label: 'User Management' },
                 ]}
             />
         </Sider>

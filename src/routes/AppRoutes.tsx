@@ -1,8 +1,9 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import { Issues, Login, NotFound, Profile, Register } from "../pages";
+import { Issues, Login, NotFound, Profile, Register, Users } from "../pages";
 import AppLayout from "../components/Layouts/Layout";
 import AuthGuard from "./AuthGuard";
+import AdminRoute from "./AdminRoute";
 
 const router = createBrowserRouter([
     // Root:redirect to auth login
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
             { index: true, element: <Navigate to="issues" /> },
             { path: "issues", element: <Issues /> },
             { path: 'profile', element: <Profile /> },
+            { path: "users", element: <AdminRoute><Users /></AdminRoute> }
         ],
     },
 
