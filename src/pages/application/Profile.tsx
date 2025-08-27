@@ -1,18 +1,11 @@
-import { Card, Typography, Button, Divider, Avatar, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { removeToken } from '../../utils/auth';
+import { Card, Typography, Button, Divider, Avatar } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { useAuthCtx } from '../../context/AuthContext';
 
 const { Title, Text } = Typography;
 
 export const Profile = () => {
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        removeToken();
-        message.success('Logged out successfully');
-        navigate('/auth/login', { replace: true });
-    };
+    const { logout, user } = useAuthCtx();
 
     return (
         <div style={{
@@ -51,9 +44,9 @@ export const Profile = () => {
                         }}
                     />
                     <Title level={3} style={{ margin: 0, color: '#1f1f1f' }}>
-                        John Doe
+                        {user?.name}
                     </Title>
-                    <Text type="secondary">john@example.com</Text>
+                    <Text type="secondary">{user?.email}</Text>
                 </div>
 
                 {/* Info Grid */}
@@ -65,20 +58,14 @@ export const Profile = () => {
                 }}>
                     <div style={infoItemStyle}>
                         <Text strong>Role</Text>
-                        <Tag color="geekblue">Admin</Tag>
+                        <Tag color="geekblue">{user?.role}</Tag>
                     </div>
-                    <div style={infoItemStyle}>
-                        <Text strong>Status</Text>
-                        <Tag color="green">Active</Tag>
-                    </div>
+
                     <div style={infoItemStyle}>
                         <Text strong>Member Since</Text>
-                        <Text>January 2024</Text>
+                        <Text>{user?.createdAt}</Text>
                     </div>
-                    <div style={infoItemStyle}>
-                        <Text strong>Last Login</Text>
-                        <Text>Today, 10:30 AM</Text>
-                    </div>
+
                 </div>
 
                 <Divider style={{ margin: '24px 0' }} />
@@ -90,7 +77,7 @@ export const Profile = () => {
                         danger
                         icon={<LogoutOutlined />}
                         size="large"
-                        onClick={handleLogout}
+                        onClick={logout}
                         style={{
                             borderRadius: 8,
                             fontWeight: 500,
