@@ -14,7 +14,7 @@ const router = createBrowserRouter([
     // Dashboard routes (with layout)
     {
         path: '/dashboard',
-        element: <AuthGuard><AppLayout children={undefined} /></AuthGuard>,
+        element: <AuthGuard><AppLayout /></AuthGuard>,
         children: [
             { index: true, element: <Navigate to="issues" /> },
             { path: "issues", element: <Issues /> },
