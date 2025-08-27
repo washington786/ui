@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     {
         path: '/auth',
         children: [
-            { index: true, element: <Navigate to="login" /> }, // ✅ Relative redirect
+            { index: true, element: <Navigate to="login" /> },
             { path: 'login', element: <Login /> },
             { path: 'register', element: <Register /> },
         ],
