@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { Issues, Login, NotFound, Profile, Register } from "../pages";
-import { Layout } from "../components";
-import UseAuthProtected from "../hooks/useAuth";
+import AppLayout from "../components/Layouts/Layout";
+import AuthGuard from "./AuthGuard";
 
 const router = createBrowserRouter([
     // Root:redirect to auth login
@@ -14,9 +14,10 @@ const router = createBrowserRouter([
     // Dashboard routes (with layout)
     {
         path: '/dashboard',
-        element: <UseAuthProtected><Layout /></UseAuthProtected>,
+        element: <AuthGuard><AppLayout children={undefined} /></AuthGuard>,
         children: [
-            { index: true, element: <Issues /> },
+            { index: true, element: <Navigate to="issues" /> },
+            { path: "issues", element: <Issues /> },
             { path: 'profile', element: <Profile /> },
         ],
     },

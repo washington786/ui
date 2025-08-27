@@ -1,12 +1,15 @@
-import type { FC, ReactNode } from "react"
+import { useEffect } from "react"
 import { isAuthenticated } from "../utils/auth"
-import { Navigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
-interface isAuthProps {
-    children: ReactNode
-}
-const UseAuthProtected: FC<isAuthProps> = ({ children }) => {
-    return isAuthenticated.toString() ? <>{children}</> : <Navigate to={'/auth/login'} />
+const UseAuthProtected = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isAuthenticated()) {
+            navigate('/auth/login', { replace: true });
+        }
+    }, [navigate]);
 }
 
 export default UseAuthProtected

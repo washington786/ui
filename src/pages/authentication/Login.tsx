@@ -18,7 +18,7 @@ export const Login = () => {
         try {
             const res = await api.post('/users/login', values)
             setToken(res.data.token)
-            navigate('/dashboard/issues')
+            navigate('/dashboard')
         } catch (err: any) {
             alert(`Login failed ${err.message}`)
         } finally {

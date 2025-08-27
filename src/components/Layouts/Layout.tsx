@@ -1,19 +1,19 @@
 
-import { Layout } from 'antd'
-import Sidebar from './Sidebar'
+import { Layout as AntLayout } from 'antd';
+import Sidebar from './Sidebar';
+import { Outlet } from 'react-router-dom';
+import { Content } from 'antd/es/layout/layout';
 
-const { Content } = Layout
-
-export const AppLayout = ({ children }: { children: React.ReactNode }) => {
+export const AppLayout = () => {
     return (
-        <Layout style={{ minHeight: '100vh' }}>
+        <AntLayout style={{ minHeight: '100vh' }}>
             <Sidebar />
-            <Layout>
+            <AntLayout>
                 <Content style={{ margin: '24px', background: '#fff', padding: 24, borderRadius: 8 }}>
-                    {children}
+                    <Outlet />
                 </Content>
-            </Layout>
-        </Layout>
+            </AntLayout>
+        </AntLayout>
     )
 }
-export default Layout
+export default AppLayout
