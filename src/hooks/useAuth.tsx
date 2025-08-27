@@ -5,8 +5,8 @@ import { Navigate } from "react-router-dom"
 interface isAuthProps {
     children: ReactNode
 }
-const useAuthProtected: FC<isAuthProps> = ({ children }) => {
+const UseAuthProtected: FC<isAuthProps> = ({ children }) => {
     return isAuthenticated.toString() ? <>{children}</> : <Navigate to={'/auth/login'} />
 }
 
-export default useAuthProtected
+export default UseAuthProtected

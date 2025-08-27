@@ -1,12 +1,11 @@
-// router.tsx
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-// Pages
 import { Issues, Login, NotFound, Profile, Register } from "../pages";
 import { Layout } from "../components";
+import UseAuthProtected from "../hooks/useAuth";
 
 const router = createBrowserRouter([
-    // Root → redirect to auth login
+    // Root:redirect to auth login
     {
         path: '/',
         element: <Navigate to="/auth/login" />,
@@ -15,14 +14,14 @@ const router = createBrowserRouter([
     // Dashboard routes (with layout)
     {
         path: '/dashboard',
-        element: <Layout />,
+        element: <UseAuthProtected><Layout /></UseAuthProtected>,
         children: [
             { index: true, element: <Issues /> },
             { path: 'profile', element: <Profile /> },
         ],
     },
 
-    // Auth routes
+    // Authentication routes
     {
         path: '/auth',
         children: [
@@ -32,7 +31,7 @@ const router = createBrowserRouter([
         ],
     },
 
-    // 404
+    // 404 page route
     {
         path: '*',
         element: <NotFound />,
