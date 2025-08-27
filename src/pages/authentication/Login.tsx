@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Form, Input, Button, Card, Typography } from 'antd'
+import { Form, Input, Card, Typography } from 'antd'
 import { useState } from 'react'
 import { api } from '../../services/api'
 import { setToken } from '../../utils/auth'
 import { useNavigate } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 import { styles } from './styles'
+import { LoginButton, LoginLink } from '../../components/AuthCommons'
 
 const { Title } = Typography
 
@@ -38,13 +38,13 @@ export const Login = () => {
                         <Input.Password />
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" loading={loading} block>
+                        <LoginButton type="primary" htmlType="submit" loading={loading} block>
                             Login
-                        </Button>
+                        </LoginButton>
                     </Form.Item>
                 </Form>
                 <p>
-                    No account? <Link to="/register">Register</Link>
+                    No account? <LoginLink to="/auth/register">Register</LoginLink>
                 </p>
             </Card>
         </div>

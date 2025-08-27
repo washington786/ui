@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Form, Input } from 'antd'
+import { Card, Form, Input } from 'antd'
 import { api } from '../../services/api'
 import { useState } from 'react'
 import { setToken } from '../../utils/auth'
@@ -28,26 +28,28 @@ export const Register = () => {
 
     return (
         <div style={styles.container}>
-            <LoginTitle>Register</LoginTitle>
-            <Form onFinish={onFinish} layout="vertical">
-                <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item name="email" label="Email" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item name="password" label="Password" rules={[{ required: true }]}>
-                    <Input.Password />
-                </Form.Item>
-                <Form.Item>
-                    <LoginButton htmlType="submit" loading={loading} block>
-                        Register
-                    </LoginButton>
-                </Form.Item>
-            </Form>
-            <p>
-                Already have an account? <LoginLink to="/login">Login</LoginLink>
-            </p>
+            <Card style={styles.card}>
+                <LoginTitle>Register</LoginTitle>
+                <Form onFinish={onFinish} layout="vertical">
+                    <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="password" label="Password" rules={[{ required: true }]}>
+                        <Input.Password />
+                    </Form.Item>
+                    <Form.Item>
+                        <LoginButton htmlType="submit" loading={loading} block>
+                            Register
+                        </LoginButton>
+                    </Form.Item>
+                </Form>
+                <p>
+                    Already have an account? <LoginLink to="/auth/login">Login</LoginLink>
+                </p>
+            </Card>
         </div>
     )
 }
