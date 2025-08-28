@@ -1,4 +1,4 @@
-import AnimatedPage from "./AnimatedPage";
+import { AccessLimited } from "./AccessLimited";
 import AuthRedirect from "./AuthRedirect";
 import AddModal from "./commons/AddModal";
 import DeleteModal from "./commons/DeleteModal";
@@ -11,7 +11,7 @@ import Sidebar from "./Layouts/Sidebar";
 export {
     Sidebar,
     Layout,
-    AnimatedPage,
+    AccessLimited,
     AuthRedirect,
     AddModal, EditModal, DeleteModal, ViewModel
 }

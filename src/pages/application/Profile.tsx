@@ -6,8 +6,11 @@ import { useNavigate } from 'react-router-dom';
 const { Title, Text } = Typography;
 
 export const Profile = () => {
+
     const navigate = useNavigate();
+
     const { logout, user } = useAuthCtx();
+
     function handlelogout() {
         navigate('/auth/login', { replace: true });
         logout();
