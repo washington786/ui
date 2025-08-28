@@ -4,6 +4,54 @@
 
 A modern, full-featured frontend for an issue tracking system built with React, TypeScript, Ant Design, and Vite. This application provides a professional interface for managing issues with role-based access control and responsive design.
 
+frontend/
+├── public/                    # Static assets (directly served)
+│   ├── favicon.ico
+│
+├── src/
+│   ├── components/            # Reusable UI components
+│   │
+│   ├── contexts/              # React context providers
+│   │   ├── AuthContext.tsx
+│   │
+│   ├── hooks/                 # Custom React hooks
+│   │   ├── useAuth.ts
+│   │   └── useIssues.ts
+│   │
+│   ├── pages/                 # Page components (route-level)
+│   │   ├── Auth/
+│   │   │   ├── Login.tsx
+│   │   │   └── Register.tsx
+│   │   └── Dashboard/
+│   │       ├── Issues.tsx
+│   │       ├── Profile.tsx
+│   │       └── Users.tsx
+│   │
+│   ├── routes/                # Routing configuration
+│   │   └── router.tsx
+│   │
+│   ├── services/              # API service layer
+│   │   └── api.ts
+│   │
+│   ├── utils/                 # Utility functions and types
+│   │   ├── auth.ts
+│   │   ├── types/
+│   │   │   ├── issues.ts
+│   │   │   └── users.ts
+│   │   └── mappers.ts
+│   │
+│   ├── App.tsx                # Main app component
+│   ├── main.tsx               # Entry point
+│   └── index.css
+│
+├── .dockerignore
+├── Dockerfile
+├── nginx.conf
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── README.md
+
 ## Features
 
 - **User Authentication**
