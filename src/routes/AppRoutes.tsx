@@ -4,12 +4,13 @@ import { Issues, Login, NotFound, Profile, Register, Users } from "../pages";
 import AppLayout from "../components/Layouts/Layout";
 import AuthGuard from "./AuthGuard";
 import AdminRoute from "./AdminRoute";
+import { AuthRedirect } from "../components";
 
 const router = createBrowserRouter([
     // Root:redirect to auth login
     {
         path: '/',
-        element: <Navigate to="/auth/login" />,
+        element: <AuthRedirect />,
     },
 
     // Dashboard routes (with layout)

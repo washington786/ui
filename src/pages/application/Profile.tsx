@@ -1,12 +1,17 @@
 import { Card, Typography, Button, Divider, Avatar } from 'antd';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useAuthCtx } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
 export const Profile = () => {
+    const navigate = useNavigate();
     const { logout, user } = useAuthCtx();
-
+    function handlelogout() {
+        navigate('/auth/login', { replace: true });
+        logout();
+    }
     return (
         <div style={{
             padding: '40px 20px',
@@ -77,7 +82,7 @@ export const Profile = () => {
                         danger
                         icon={<LogoutOutlined />}
                         size="large"
-                        onClick={logout}
+                        onClick={handlelogout}
                         style={{
                             borderRadius: 8,
                             fontWeight: 500,

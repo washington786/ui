@@ -1,9 +1,17 @@
 import AnimatedPage from "./AnimatedPage";
+import AuthRedirect from "./AuthRedirect";
+import AddModal from "./commons/AddModal";
+import DeleteModal from "./commons/DeleteModal";
+import EditModal from "./commons/EditModal";
+import ViewModel from "./commons/ViewModel";
 import Layout from "./Layouts/Layout";
 import Sidebar from "./Layouts/Sidebar";
+
 
 export {
     Sidebar,
     Layout,
-    AnimatedPage
+    AnimatedPage,
+    AuthRedirect,
+    AddModal, EditModal, DeleteModal, ViewModel
 }

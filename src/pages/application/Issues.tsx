@@ -5,98 +5,56 @@ import {
     Tag,
     Button,
     Space,
-    Modal,
     DatePicker,
     Select,
     Typography,
     Card,
-    Form,
-    Input,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { Key } from 'react';
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../services/api';
 import type { Issue, IssuePriority, IssueStatus } from '../../utils/types/issues';
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import { useAuthCtx } from '../../context/AuthContext';
+import { AddModal, EditModal, DeleteModal, ViewModel } from '../../components';
+import { useIssues } from '../../hooks/useIssues';
 
 const { Text } = Typography;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 export const Issues = () => {
+
+    const { user } = useAuthCtx();
+    const { issues,
+        isIssuesLoading,
+
+        // Mutations
+
+        addMutation,
+        editMutation,
+        deleteMutation,
+
+        // Modal state
+        addModal,
+        setAddModal,
+        editModal,
+        setEditModal,
+        deleteModal,
+        setDeleteModal,
+        viewModal,
+        setViewModal, } = useIssues();
+
     const [filters, setFilters] = useState<{
         status?: IssueStatus;
         priority?: IssuePriority;
         dateRange?: [string, string];
     }>({});
-    const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string | null }>({
-        visible: false,
-        id: null,
-    });
-    const [viewModal, setViewModal] = useState<{ visible: boolean; issue: Issue | null }>({
-        visible: false,
-        issue: null,
-    });
-
-    const [editModal, setEditModal] = useState<{ visible: boolean; issue: Issue | null }>({
-        visible: false,
-        issue: null,
-    });
-    const [addModal, setAddModal] = useState<{ visible: boolean }>({ visible: false });
-
-    const queryClient = useQueryClient();
-
-    const { data, isLoading } = useQuery({
-        queryKey: ['issues'],
-        queryFn: async () => {
-            const res = await api.get('/issues');
-            return res.data as Issue[];
-        },
-    });
-
-    const addMutation = useMutation({
-        mutationFn: async (values: Omit<Issue, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
-            const res = await api.post('/issues', values);
-            return res.data as Issue;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['issues'] });
-            setAddModal({ visible: false });
-        },
-    });
-
-    const editMutation = useMutation({
-        mutationFn: async (values: { id: string } & Omit<Issue, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
-            const res = await api.patch(`/issues/${values.id}`, {
-                title: values.title,
-                description: values.description,
-                status: values.status,
-                priority: values.priority,
-            });
-            return res.data as Issue;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['issues'] });
-            setEditModal({ visible: false, issue: null });
-        },
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: async (id: string) => {
-            await api.delete(`/issues/${id}`);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['issues'] });
-            setDeleteModal({ visible: false, id: null });
-        },
-    });
 
     const filteredData = useMemo(() => {
-        if (!data) return [];
+        if (!issues) return [];
 
-        return data.filter((issue: Issue) => {
+        return issues.filter((issue: Issue) => {
             const { status, priority, dateRange } = filters;
 
             if (status && issue.status !== status) return false;
@@ -110,7 +68,7 @@ export const Issues = () => {
 
             return true;
         });
-    }, [data, filters]);
+    }, [issues, filters]);
 
     const columns: ColumnsType<Issue> = [
         {
@@ -188,6 +146,7 @@ export const Issues = () => {
                     <Button
                         size="small"
                         type="default"
+                        disabled={user?.role != "admin"}
                         icon={<EditOutlined />}
                         onClick={() => setEditModal({ visible: true, issue: record })}
                         title="Edit"
@@ -195,6 +154,7 @@ export const Issues = () => {
                     <Button
                         size="small"
                         type="dashed"
+                        disabled={user?.role != "admin"}
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => setDeleteModal({ visible: true, id: record.id })}
@@ -262,7 +222,7 @@ export const Issues = () => {
                     rowKey="id"
                     columns={columns}
                     dataSource={filteredData}
-                    loading={isLoading}
+                    loading={isIssuesLoading}
                     pagination={{
                         pageSize: 10,
                         showSizeChanger: true,
@@ -273,114 +233,25 @@ export const Issues = () => {
             </Card>
 
             {/* View Modal */}
-            <Modal
-                title="Issue Details"
-                open={viewModal.visible}
-                onCancel={() => setViewModal({ visible: false, issue: null })}
-                footer={null}
-            >
-                {viewModal.issue && (
-                    <div>
-                        <p><strong>Title:</strong> {viewModal.issue.title}</p>
-                        <p><strong>Description:</strong> {viewModal.issue.description}</p>
-                        <p><strong>Status:</strong> {viewModal.issue.status.replace('-', ' ')}</p>
-                        <p><strong>Priority:</strong> {viewModal.issue.priority}</p>
-                        <p><strong>Created By:</strong> {viewModal.issue.createdBy.name} ({viewModal.issue.createdBy.email})</p>
-                        <p><strong>Created At:</strong> {new Date(viewModal.issue.createdAt).toLocaleString()}</p>
-                    </div>
-                )}
-            </Modal>
+            <ViewModel setViewModal={setViewModal} viewModal={viewModal} />
 
             {/* Add Issue Modal */}
-            <Modal
-                title="Add New Issue"
-                open={addModal.visible}
-                confirmLoading={addMutation.isPending}
-                onOk={() => {
-                    // Form will handle submit
-                }}
-                onCancel={() => setAddModal({ visible: false })}
-            >
-                <Form
-                    layout="vertical"
-                    onFinish={(values) => {
-                        addMutation.mutate(values);
-                    }}
-                >
-                    <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-                        <Input.TextArea />
-                    </Form.Item>
-                    <Form.Item name="status" label="Status" initialValue="open" rules={[{ required: true }]}>
-                        <Select>
-                            <Option value="open">Open</Option>
-                            <Option value="in-progress">In Progress</Option>
-                            <Option value="resolved">Resolved</Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item name="priority" label="Priority" initialValue="medium" rules={[{ required: true }]}>
-                        <Select>
-                            <Option value="low">Low</Option>
-                            <Option value="medium">Medium</Option>
-                            <Option value="high">High</Option>
-                        </Select>
-                    </Form.Item>
-                </Form>
-            </Modal>
+            <AddModal addModal={addModal} setAddModal={setAddModal} onLoadingConfirmation={addMutation.isPending} onAdd={(values) => addMutation.mutate(values)} />
 
             {/* Delete Confirmation Modal */}
-            <Modal
-                title="Delete Issue"
-                open={deleteModal.visible}
-                onOk={() => deleteMutation.mutate(deleteModal.id!)}
-                confirmLoading={deleteMutation.isPending}
-                onCancel={() => setDeleteModal({ visible: false, id: null })}
-                okButtonProps={{ danger: true }}
-            >
-                Are you sure you want to delete this issue?
-            </Modal>
+            <DeleteModal deleteLoading={deleteMutation.isPending} deleteModal={deleteModal} onDeleteConfirmation={() => deleteMutation.mutate(deleteModal.id!)} setDeleteModal={setDeleteModal} />
 
             {/* Edit Issue Modal */}
-            <Modal
-                title="Edit Issue"
-                open={editModal.visible}
-                confirmLoading={editMutation.isPending}
-                onOk={() => {
-                    // Form will handle submit
+            <EditModal
+                editModal={editModal}
+                setEditModal={setEditModal}
+                onEdit={(values) => {
+                    editMutation.mutate({ id: editModal.issue!.id, ...values });
                 }}
-                onCancel={() => setEditModal({ visible: false, issue: null })}
-            >
-                <Form
-                    layout="vertical"
-                    initialValues={editModal.issue || {}}
-                    onFinish={(values) => {
-                        editMutation.mutate({ id: editModal.issue!.id, ...values });
-                    }}
-                >
-                    <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-                        <Input.TextArea />
-                    </Form.Item>
-                    <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-                        <Select>
-                            <Option value="open">Open</Option>
-                            <Option value="in-progress">In Progress</Option>
-                            <Option value="resolved">Resolved</Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item name="priority" label="Priority" rules={[{ required: true }]}>
-                        <Select>
-                            <Option value="low">Low</Option>
-                            <Option value="medium">Medium</Option>
-                            <Option value="high">High</Option>
-                        </Select>
-                    </Form.Item>
-                </Form>
-            </Modal>
+                onSubmitOk={() => {
+                    setEditModal({ visible: false, issue: null });
+                }}
+                onLoadingConfirmation={editMutation.isPending} />
         </div>
     );
 };

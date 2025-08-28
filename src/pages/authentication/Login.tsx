@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Input, Card, Typography } from 'antd'
 import { useState } from 'react'
-import { api } from '../../services/api'
-import { setToken } from '../../utils/auth'
 import { useNavigate } from 'react-router-dom'
 import { styles } from './styles'
 import { LoginButton, LoginLink } from '../../components/AuthCommons'
+import { useAuthCtx } from '../../context/AuthContext'
 
 const { Title } = Typography
 
 export const Login = () => {
     const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
 
-    const onFinish = async (values: any) => {
+    const navigate = useNavigate();
+
+    const { login } = useAuthCtx();
+
+    const onFinish = async (values: { email: string, password: string }) => {
         setLoading(true)
         try {
-            const res = await api.post('/users/login', values)
-            setToken(res.data.token)
+            await login(values.email, values.password);
             navigate('/dashboard')
         } catch (err: any) {
             alert(`Login failed ${err.message}`)
