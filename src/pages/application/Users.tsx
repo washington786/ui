@@ -8,46 +8,16 @@ import {
     Button,
     Modal,
 } from 'antd';
-import { useState, type Key } from 'react';
-import { api } from '../../services/api';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type Key } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import type { User } from '../../utils/IUser';
 import type { ColumnsType } from 'antd/es/table';
-import { useAuthCtx } from '../../context/AuthContext';
+import useUsers from '../../hooks/useUsers';
 
 const { Text } = Typography;
 
 export const Users = () => {
-    const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string | null }>({
-        visible: false,
-        id: null,
-    });
-    const { user } = useAuthCtx();
-
-    const queryClient = useQueryClient();
-
-    const { data, isLoading } = useQuery({
-        queryKey: ['users'],
-        queryFn: async () => {
-            const res = await api.get('/users/list');
-            return res.data.map((user: any) => ({
-                ...user,
-                id: user._id,
-            })) as User[];
-        },
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: async (id: string) => {
-            if (!id) throw new Error('Invalid user ID');
-            await api.delete(`/users/${id}`);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['users'] });
-            setDeleteModal({ visible: false, id: null });
-        },
-    });
+    const { deleteModal, user, data, isLoading, deleteMutation, setDeleteModal } = useUsers();
 
     const columns: ColumnsType<User> = [
         {

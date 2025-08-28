@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from "react";
 import { useAuthCtx } from "../context/AuthContext";
+import { AccessLimited } from "../components";
 
 interface props {
     children: ReactNode
@@ -8,7 +9,7 @@ const AdminRoute: FC<props> = ({ children }) => {
     const { user } = useAuthCtx();
 
     if (user?.role !== 'admin') {
-        return <div style={{ padding: 24 }}>Access Denied. Admins only.</div>;
+        return <AccessLimited />;
     }
     return children;
 };

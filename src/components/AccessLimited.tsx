@@ -21,7 +21,6 @@ export const AccessLimited = () => {
             }}
         >
             <Card
-                bordered={false}
                 style={{
                     maxWidth: 500,
                     width: '100%',
@@ -53,11 +52,6 @@ export const AccessLimited = () => {
                     <h1 style={{ fontSize: 28, fontWeight: 600, color: '#1f1f1f', marginBottom: 12 }}>
                         Access Denied
                     </h1>
-                    <p style={{ color: '#595959', lineHeight: 1.6, marginBottom: 32 }}>
-                        You don't have permission to view this page.
-                        <br />
-                        Only administrators can access this section.
-                    </p>
 
                     {/* Warning Alert */}
                     <Alert
