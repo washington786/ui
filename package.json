@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:build": "docker build -t issue-tracker-frontend .",
+    "docker:run": "docker run -d -p 80:80 issue-tracker-frontend"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
