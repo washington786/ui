@@ -1,26 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Input, Modal, Select } from 'antd';
-import { Option } from 'antd/es/mentions';
 import type { FC } from 'react';
 
-interface props {
-    addModal: { visible: boolean },
-    setAddModal: (modalState: { visible: boolean; }) => void;
+interface Props {
+    addModal: { visible: boolean };
+    setAddModal: (modalState: { visible: boolean }) => void;
     onLoadingConfirmation: boolean;
-    onAdd(values: any): void;
-    onSubmitOk?(): void;
+    onAdd: (values: any) => void;
 }
 
-const AddModal: FC<props> = ({ addModal, onAdd, onLoadingConfirmation, setAddModal, onSubmitOk }) => {
+const AddModal: FC<Props> = ({
+    addModal,
+    onAdd,
+    onLoadingConfirmation,
+    setAddModal,
+}) => {
+    const [form] = Form.useForm();
+
+    const handleOk = () => {
+        form.submit();
+    };
+
+    const handleCancel = () => {
+        form.resetFields();
+        setAddModal({ visible: false });
+    };
+
     return (
         <Modal
             title="Add New Issue"
             open={addModal.visible}
             confirmLoading={onLoadingConfirmation}
-            onOk={onSubmitOk}
-            onCancel={() => setAddModal({ visible: false })}
+            onOk={handleOk}
+            onCancel={handleCancel}
         >
             <Form
+                form={form}
                 layout="vertical"
                 onFinish={(values) => {
                     onAdd(values);
@@ -34,21 +49,21 @@ const AddModal: FC<props> = ({ addModal, onAdd, onLoadingConfirmation, setAddMod
                 </Form.Item>
                 <Form.Item name="status" label="Status" initialValue="open" rules={[{ required: true }]}>
                     <Select>
-                        <Option value="open">Open</Option>
-                        <Option value="in-progress">In Progress</Option>
-                        <Option value="resolved">Resolved</Option>
+                        <Select.Option value="open">Open</Select.Option>
+                        <Select.Option value="in-progress">In Progress</Select.Option>
+                        <Select.Option value="resolved">Resolved</Select.Option>
                     </Select>
                 </Form.Item>
                 <Form.Item name="priority" label="Priority" initialValue="medium" rules={[{ required: true }]}>
                     <Select>
-                        <Option value="low">Low</Option>
-                        <Option value="medium">Medium</Option>
-                        <Option value="high">High</Option>
+                        <Select.Option value="low">Low</Select.Option>
+                        <Select.Option value="medium">Medium</Select.Option>
+                        <Select.Option value="high">High</Select.Option>
                     </Select>
                 </Form.Item>
             </Form>
         </Modal>
-    )
-}
+    );
+};
 
-export default AddModal
+export default AddModal;

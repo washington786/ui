@@ -8,33 +8,39 @@ import {
     Button,
     Modal,
 } from 'antd';
-import { useState } from 'react';
+import { useState, type Key } from 'react';
 import { api } from '../../services/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import type { User } from '../../utils/IUser';
+import type { ColumnsType } from 'antd/es/table';
+import { useAuthCtx } from '../../context/AuthContext';
 
 const { Text } = Typography;
-
 
 export const Users = () => {
     const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string | null }>({
         visible: false,
         id: null,
     });
+    const { user } = useAuthCtx();
 
     const queryClient = useQueryClient();
 
     const { data, isLoading } = useQuery({
         queryKey: ['users'],
         queryFn: async () => {
-            const res = await api.get('/users');
-            return res.data as User[];
+            const res = await api.get('/users/list');
+            return res.data.map((user: any) => ({
+                ...user,
+                id: user._id,
+            })) as User[];
         },
     });
 
     const deleteMutation = useMutation({
         mutationFn: async (id: string) => {
+            if (!id) throw new Error('Invalid user ID');
             await api.delete(`/users/${id}`);
         },
         onSuccess: () => {
@@ -43,7 +49,7 @@ export const Users = () => {
         },
     });
 
-    const columns = [
+    const columns: ColumnsType<User> = [
         {
             title: 'Name',
             dataIndex: 'name',
@@ -63,7 +69,7 @@ export const Users = () => {
                 { text: 'User', value: 'user' },
                 { text: 'Admin', value: 'admin' },
             ],
-            onFilter: (value: boolean | React.Key, record: User) => record.role === value,
+            onFilter: (value: Key | boolean, record: User) => record.role === value,
             render: (role: 'user' | 'admin') => (
                 <Tag color={role === 'admin' ? 'purple' : 'blue'}>
                     {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -81,18 +87,13 @@ export const Users = () => {
             key: 'actions',
             render: (_: any, record: User) => (
                 <Space>
-                    <Button size="small" type="default" icon={<EditOutlined />}>
-                        Edit
-                    </Button>
                     <Button
                         size="small"
                         type="dashed"
                         danger
                         icon={<DeleteOutlined />}
                         onClick={() => setDeleteModal({ visible: true, id: record.id })}
-                    >
-                        Remove
-                    </Button>
+                    />
                 </Space>
             ),
         },
@@ -101,13 +102,12 @@ export const Users = () => {
     return (
         <Card
             title="Users"
-            bordered={false}
             style={{ margin: '0 auto', maxWidth: 1000 }}
         >
             <Table
                 rowKey="id"
                 columns={columns}
-                dataSource={data}
+                dataSource={data?.filter(usr => usr.id != user?.id)}
                 loading={isLoading}
                 pagination={{ pageSize: 10 }}
                 scroll={{ x: 800 }}
@@ -116,7 +116,7 @@ export const Users = () => {
             <Modal
                 title="Delete User"
                 open={deleteModal.visible}
-                onOk={() => deleteMutation.mutate(deleteModal.id!)}
+                onOk={() => deleteModal.id && deleteMutation.mutate(deleteModal.id)}
                 confirmLoading={deleteMutation.isPending}
                 onCancel={() => setDeleteModal({ visible: false, id: null })}
                 okButtonProps={{ danger: true }}

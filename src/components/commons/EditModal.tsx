@@ -1,31 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Input, Modal, Select } from 'antd';
-import { Option } from 'antd/es/mentions';
-import { type FC } from 'react'
+import { type FC } from 'react';
 import type { Issue } from '../../utils/types/issues';
 
-interface props {
-    editModal: { visible: boolean, issue: Issue | null },
+interface Props {
+    editModal: { visible: boolean; issue: Issue | null };
     setEditModal: (modalState: { visible: boolean; issue: Issue | null }) => void;
     onLoadingConfirmation: boolean;
-    onEdit(values: any): void;
-    onSubmitOk?(): void;
+    onEdit: (values: any) => void;
 }
 
-const EditModal: FC<props> = ({ editModal, setEditModal, onLoadingConfirmation, onEdit, onSubmitOk }) => {
+const EditModal: FC<Props> = ({ editModal, setEditModal, onLoadingConfirmation, onEdit }) => {
+    const [form] = Form.useForm();
+
+    const handleOk = () => {
+        form.submit();
+    };
+
+    const handleCancel = () => {
+        form.resetFields();
+        setEditModal({ visible: false, issue: null });
+    };
+
     return (
         <Modal
             title="Edit Issue"
             open={editModal.visible}
             confirmLoading={onLoadingConfirmation}
-            onOk={onSubmitOk}
-            onCancel={() => setEditModal({ visible: false, issue: null })}
+            onOk={handleOk}
+            onCancel={handleCancel}
         >
             <Form
+                form={form}
                 layout="vertical"
                 initialValues={editModal.issue || {}}
                 onFinish={(values) => {
-                    onEdit(values);
+                    onEdit({ id: editModal.issue?._id, ...values });
                 }}
             >
                 <Form.Item name="title" label="Title" rules={[{ required: true }]}>
@@ -36,21 +46,21 @@ const EditModal: FC<props> = ({ editModal, setEditModal, onLoadingConfirmation, 
                 </Form.Item>
                 <Form.Item name="status" label="Status" rules={[{ required: true }]}>
                     <Select>
-                        <Option value="open">Open</Option>
-                        <Option value="in-progress">In Progress</Option>
-                        <Option value="resolved">Resolved</Option>
+                        <Select.Option value="open">Open</Select.Option>
+                        <Select.Option value="in-progress">In Progress</Select.Option>
+                        <Select.Option value="resolved">Resolved</Select.Option>
                     </Select>
                 </Form.Item>
                 <Form.Item name="priority" label="Priority" rules={[{ required: true }]}>
                     <Select>
-                        <Option value="low">Low</Option>
-                        <Option value="medium">Medium</Option>
-                        <Option value="high">High</Option>
+                        <Select.Option value="low">Low</Select.Option>
+                        <Select.Option value="medium">Medium</Select.Option>
+                        <Select.Option value="high">High</Select.Option>
                     </Select>
                 </Form.Item>
             </Form>
         </Modal>
-    )
-}
+    );
+};
 
-export default EditModal
+export default EditModal;

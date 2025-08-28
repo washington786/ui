@@ -1,12 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { Issue } from "../utils/types/issues";
 import { api } from "../services/api";
+import { message } from "antd";
+
+type CreateIssueData = Omit<Issue, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>;
+type UpdateIssueData = Partial<CreateIssueData> & { id: string };
 
 export const useIssues = () => {
     const queryClient = useQueryClient();
 
-    // Local state for modals
+    // Modal state
     const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string | null }>({
         visible: false,
         id: null,
@@ -24,60 +29,77 @@ export const useIssues = () => {
 
     const [addModal, setAddModal] = useState<{ visible: boolean }>({ visible: false });
 
-    // useQuery at top level
+    // Fetch issues
     const {
-        data: issues,
+        data: issues = [],
         isLoading: isIssuesLoading,
         isError,
     } = useQuery({
         queryKey: ['issues'],
         queryFn: async () => {
             const res = await api.get('/issues');
-            return res.data as Issue[];
+            // Map _id → id for frontend
+            return res.data.map((issue: any) => ({
+                ...issue,
+                id: issue._id,
+            })) as Issue[];
         },
     });
 
     // Add mutation
     const addMutation = useMutation({
-        mutationFn: async (values: Omit<Issue, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
+        mutationFn: async (values: CreateIssueData) => {
             const res = await api.post('/issues', values);
-            return res.data as Issue;
+            return {
+                ...res.data,
+                id: res.data._id, // Map _id → id
+            } as Issue;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['issues'] });
             setAddModal({ visible: false });
+            message.success('Issue created successfully');
+        },
+        onError: (error: any) => {
+            message.error(error.response?.data?.msg || 'Failed to create issue');
         },
     });
 
     // Edit mutation
     const editMutation = useMutation({
-        mutationFn: async (values: { id: string } & Omit<Issue, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>) => {
-            const res = await api.patch(`/issues/${values.id}`, {
-                title: values.title,
-                description: values.description,
-                status: values.status,
-                priority: values.priority,
-            });
-            return res.data as Issue;
+        mutationFn: async ({ id, ...updateData }: UpdateIssueData) => {
+            const res = await api.put(`/issues/${id}`, updateData);
+            return {
+                ...res.data,
+                id: res.data._id,
+            } as Issue;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['issues'] });
             setEditModal({ visible: false, issue: null });
+            message.success('Issue updated successfully');
+        },
+        onError: (error: any) => {
+            message.error(error.response?.data?.msg || 'Failed to update issue');
         },
     });
 
     // Delete mutation
     const deleteMutation = useMutation({
         mutationFn: async (id: string) => {
+            if (!id) throw new Error('Invalid issue ID');
             await api.delete(`/issues/${id}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['issues'] });
             setDeleteModal({ visible: false, id: null });
+            message.success('Issue deleted');
+        },
+        onError: (error: any) => {
+            message.error(error.response?.data?.msg || 'Failed to delete issue');
         },
     });
 
-    // Return all state and logic
     return {
         // Query
         issues,

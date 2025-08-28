@@ -26,7 +26,10 @@ const { Option } = Select;
 export const Issues = () => {
 
     const { user } = useAuthCtx();
-    const { issues,
+
+    const {
+        // data for issues
+        issues,
         isIssuesLoading,
 
         // Mutations
@@ -157,7 +160,7 @@ export const Issues = () => {
                         disabled={user?.role != "admin"}
                         danger
                         icon={<DeleteOutlined />}
-                        onClick={() => setDeleteModal({ visible: true, id: record.id })}
+                        onClick={() => setDeleteModal({ visible: true, id: record._id })}
                         title="Delete"
                     />
                 </Space>
@@ -246,10 +249,7 @@ export const Issues = () => {
                 editModal={editModal}
                 setEditModal={setEditModal}
                 onEdit={(values) => {
-                    editMutation.mutate({ id: editModal.issue!.id, ...values });
-                }}
-                onSubmitOk={() => {
-                    setEditModal({ visible: false, issue: null });
+                    editMutation.mutate({ id: editModal.issue!._id, ...values });
                 }}
                 onLoadingConfirmation={editMutation.isPending} />
         </div>

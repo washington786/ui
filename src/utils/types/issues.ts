@@ -2,7 +2,7 @@ export type IssueStatus = 'open' | 'in-progress' | 'resolved';
 export type IssuePriority = 'low' | 'medium' | 'high';
 
 export interface Issue {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     status: IssueStatus;
@@ -13,4 +13,7 @@ export interface Issue {
     };
     createdAt: string;
     updatedAt: string;
+}
+export interface IssueView extends Omit<Issue, '_id'> {
+    id: string;
 }
